@@ -1,0 +1,62 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} {% endblock %}</title>
+  
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'warehouse/warehouse.css' %}">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="{% static 'warehouse/warehouse.js' %}"></script>
+</head>
+
+<body>
+
+  <h2>Warehouse</h2>
+
+  <form id="warehouseForm" method="post">
+    {% csrf_token %}
+    <input type="text" id="searchInput" placeholder="Search...">
+    <table>
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Address</th>
+          <th>Phone</th>
+          <th>Hidden</th>
+          <th>Actions</th>  <!-- New column for actions -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for warehouse in warehouses %}
+        <tr data-id="{{ warehouse.id }}" class="warehouse-row {% if warehouse.hidden %}hidden-row{% endif %}"
+          data-hidden-state="{% if warehouse.hidden %}hidden{% else %}visible{% endif %}">
+          <td>{{ warehouse.id }}</td>
+          <td class="address">{{ warehouse.address }}</td>
+          <td class="phone">{{ warehouse.phone }}</td>
+          <td>
+            <input type="checkbox" {% if warehouse.hidden %}checked{% endif %} data-warehouse-id="{{ warehouse.id }}"
+              class="hidden-checkbox">
+          </td>
+          <td>
+            <a href="{% url 'edit_warehouse' warehouse.id %}"><button type="button"  class="button-edit">Edit</button></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="{% url 'add_warehouse' %}"><button type="button" class="add-button">Add</button></a>
+    <button type="button" class="Hidden-button">Save changes</button>
+    <button type="button" class="Show-hidden-button">Show hidden</button>
+  </form>
+
+</body>
+
+</html>
+{% endblock %}

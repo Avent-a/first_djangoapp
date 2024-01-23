@@ -24,7 +24,9 @@ urlpatterns = [
     path('', views.login, name='login'),
     path('index', views.index, name='index'),  # Empty path for the index page
     
-        
+    path('category/', views.category, name='category'),
+    path('category/add/', views.add_category, name='add_category'),
+
     path('warehouse/', views.warehouse, name='warehouse'),
     path('warehouse/add/', views.add_warehouse, name='add_warehouse'),
     path('update_hidden_status/', views.update_hidden_status, name='update_hidden_status'),

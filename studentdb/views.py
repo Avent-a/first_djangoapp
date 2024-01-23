@@ -34,6 +34,7 @@ def index(request):
     components = Components.objects.all()
     warehouse_movements = WarehouseMovement.objects.all()
     products_movements = ProductsMovement.objects.all()
+    categorys = Category.objects.all() 
 
     context = {
         'employee_id': employee_id,
@@ -45,9 +46,28 @@ def index(request):
         'components': components,
         'warehouse_movements': warehouse_movements,
         'products_movements': products_movements,
+        'categorys' : categorys,
     }
 
     return render(request, 'index.html', context)
+
+#-------------------------------------------------------------------------------------
+
+def category(request):
+    categorys = Category.objects.all()
+    return render(request, 'category.html', {
+        'categorys' : categorys
+    })
+
+def add_category(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+
+        new_category = Category(name=name)
+        new_category.save()
+        return redirect('category')
+
+    return render(request, 'add_category.html')
 
 #-------------------------------------------------------------------------------------
 

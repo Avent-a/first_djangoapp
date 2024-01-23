@@ -1,0 +1,53 @@
+{% extends 'index.html' %}
+<!DOCTYPE html>
+<html lang="en">
+{% block content %}
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} {% endblock %}</title>
+
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'category/category.css' %}">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+
+
+  <h2>Categorys</h2>
+
+  <form>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Hidden</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for categorys in categorys %}
+        <tr>
+          <td>{{ categorys.name }}</td>
+          <td>
+            <input type="checkbox" {% if warehouse.hidden %}checked{% endif %} data-warehouse-id="{{ warehouse.id }}"
+              class="hidden-checkbox">
+          </td>
+          <td>
+            <button type="button"  class="button-edit">Edit</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="{% url 'add_category' %}"><button type="button" class="add-button">Add</button></a>
+    <button type="button" class="Hidden-button">Save changes</button>
+    <button type="button" class="Show-hidden-button">Show hidden</button>
+  </form>
+  {% endblock %}
+</body>
+
+</html>

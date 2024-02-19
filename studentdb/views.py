@@ -2,6 +2,8 @@ import traceback
 from unittest import result
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+from httplib2 import Authentication
+from jsonschema import ValidationError
 from .models import *
 from django.db import connection
 from django.contrib import messages
@@ -15,6 +17,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.models import User
+from docx import Document
 
 
 
@@ -124,6 +127,33 @@ def edit_warehouse(request, warehouse_id):
     except Exception as e:
         # Отображение информации об ошибке
         return HttpResponseServerError(f"Internal Server Error: {str(e)}")
+    
+def export_to_word(request):
+    warehouses = Warehouse.objects.all()
+
+    document = Document()
+    document.add_heading('Warehouse Export', level=1)
+
+    table = document.add_table(rows=1, cols=2)
+    table.style = 'Table Grid'
+    
+    # Add table header
+    header_cells = table.rows[0].cells
+    header_cells[0].text = 'Address'
+    header_cells[1].text = 'Phone'
+
+    # Add data to the table
+    for warehouse in warehouses:
+        row_cells = table.add_row().cells
+        row_cells[0].text = warehouse.address
+        row_cells[1].text = warehouse.phone
+
+    # Response with Word document
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = 'attachment; filename=warehouse_export.docx'
+    document.save(response)
+
+    return response
 #-------------------------------------------------------------------------------------
 
 def product(request):
@@ -145,6 +175,45 @@ def add_products(request):
 
     return render(request, 'add_products.html', {'categories': categories})
 
+def update_hidden_status_products(request):
+    if request.method == 'POST':
+        products_id = request.POST.get('product_id')  # Corrected to 'products_id'
+        is_hidden_str = request.POST.get('is_hidden')
+
+        # Convert the string "true" to a boolean value
+        is_hidden = is_hidden_str.lower() == 'true'
+
+        try:
+            product = Product.objects.get(pk=products_id)  # Corrected to Product
+            product.hidden = is_hidden
+            product.save()
+            return JsonResponse({'success': True, 'hidden': product.hidden})
+        except Product.DoesNotExist:  # Corrected to Product.DoesNotExist
+            return JsonResponse({'success': False, 'error': 'Product not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def edit_products(request, product_id):
+    try:
+        product = get_object_or_404(Product, pk=product_id)
+        categories = Category.objects.all()  # Получение всех категорий
+
+        if request.method == 'POST':
+            # Обработка отправки формы для обновления деталей продукта
+            name = request.POST['name']
+            category_id = request.POST['category']
+
+            product.name = name
+            product.category_id = category_id
+            product.save()
+
+            return redirect('products')
+
+        return render(request, 'edit/edit_products.html', {'product': product, 'categories': categories})
+    except Exception as e:
+        return HttpResponseServerError(f"Internal Server Error: {str(e)}")
 
 #-------------------------------------------------------------------------------------
 
@@ -283,9 +352,7 @@ def login(request):
 
 def orders(request):
     orders = Order.objects.all()
-    return render(request, 'orders.html', {
-        'orders': orders
-    })
+    return render(request, 'orders.html', {'orders': orders})
 
 def add_orders(request):
     employees = Employee.objects.all()
@@ -318,6 +385,41 @@ def add_orders(request):
         return redirect('orders')
 
     return render(request, 'add_orders.html', {'employees': employees, 'offices': offices, 'products': products})
+
+def edit_orders(request, order_id):
+    try:
+        order = get_object_or_404(Order, pk=order_id)
+        employees = Employee.objects.all()
+        offices = Office.objects.all()
+        products = Product.objects.all()
+
+        if request.method == 'POST':
+            date = request.POST.get('date')
+            status = request.POST.get('status')
+            employee_id = request.POST.get('employee')
+            product_id = request.POST.get('product')
+            comment = request.POST.get('comment')
+            office_id = request.POST.get('office')
+
+            employee = Employee.objects.get(pk=employee_id)
+            product = Product.objects.get(pk=product_id)
+            office = Office.objects.get(pk=office_id)
+
+            order.date = date
+            order.status = status
+            order.employee = employee
+            order.product = product
+            order.comment = comment
+            order.IdOffice = office
+            order.save()
+
+            return redirect('orders')
+
+        return render(request, 'edit/edit_orders.html', {'order': order, 'employees': employees, 'offices': offices, 'products': products})
+    except Exception as e:
+        # Отображение информации об ошибке
+        return HttpResponseServerError(f"Internal Server Error: {str(e)}")
+
 #-------------------------------------------------------------------------------------
 
 def components(request):

@@ -1,4 +1,4 @@
- // search-script.js
+// search-script.js
 $(document).ready(function () {
   $("#searchInput").on("input", function () {
     var searchTerm = $(this).val().toLowerCase();
@@ -67,7 +67,7 @@ $(document).ready(function () {
         // AJAX-запрос для обновления поля 'hidden' в базе данных
         $.ajax({
           method: 'POST',
-          url: '/update_hidden_status/',  // Замените на реальный URL
+          url: '/update_hidden_status/',  
           data: {
             warehouse_id: warehouseId,
             is_hidden: isChecked

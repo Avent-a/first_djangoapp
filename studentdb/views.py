@@ -2,8 +2,6 @@ import traceback
 from unittest import result
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from httplib2 import Authentication
-from jsonschema import ValidationError
 from .models import *
 from django.db import connection
 from django.contrib import messages

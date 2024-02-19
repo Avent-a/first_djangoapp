@@ -1,4 +1,4 @@
-// search-script.js
+ // search-script.js
 $(document).ready(function () {
   $("#searchInput").on("input", function () {
     var searchTerm = $(this).val().toLowerCase();

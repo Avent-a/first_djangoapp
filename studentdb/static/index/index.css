@@ -7,7 +7,12 @@ body {
     min-height: 100vh;
 }
 
-header,
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 35px;
+}
+
 footer {
     background-color: #333;
     color: #fff;
@@ -17,7 +22,7 @@ footer {
 .header-container,
 .footer-container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: auto;
 }
 
 main {
@@ -57,4 +62,34 @@ main {
     .content {
         width: 100%;
     }
+}
+
+.header-container {
+    position: relative;
+}
+
+h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    color: white;
+    font-size: 24px;
+}
+
+.footer-container {
+    position: relative;
+}
+
+.slider-container {
+    width: 1%;
+    max-height: 1%;
+    /* Замените на нужное значение */
+    overflow: hidden;
+}
+
+.slider img {
+    width: 2%;
+    line-height: 0;
 }

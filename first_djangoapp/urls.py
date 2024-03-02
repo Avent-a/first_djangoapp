@@ -59,6 +59,7 @@ urlpatterns = [
     
     path('warehouse_movements/', views.warehouse_movements, name='warehouse_movements'),
     path('warehouse_movements/add', views.add_warehouse_movement, name='add_warehouse_movement'),
+     path('export_warehouse_movements/', views.export_warehouse_movements, name='export_warehouse_movements'),
     
     path('products_movements/', views.products_movements, name='products_movements'),
     path('products_movements/add', views.add_products_movements, name='add_products_movements'),

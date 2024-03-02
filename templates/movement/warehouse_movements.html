@@ -6,236 +6,201 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %} {% endblock %}</title>
+  <title>{% block title %}Warehouse Movements{% endblock %}</title>
   <style>
     body {
-      font-family: sans-serif;
-      /* Установка шрифта для всего документа */
+      font-family: Arial, sans-serif;
       background-color: #f2f2f2;
-      /* Установка цвета фона */
+      margin: 0;
+      padding: 0;
     }
 
     h2 {
       text-align: center;
-      /* Выравнивание заголовка по центру */
       font-weight: bold;
-      /* Установка жирного начертания шрифта */
-      margin-bottom: 24px;
-      /* Отступ снизу */
       padding: 16px;
-      /* Внутренний отступ */
       border-bottom: 1px solid #ccc;
-      /* Граница снизу */
+      margin-bottom: 24px;
     }
 
     table {
       width: 100%;
-      /* Заполнение ширины родительского контейнера */
       border-collapse: collapse;
-      /* Схлопывание границ ячеек таблицы */
       border-radius: 4px;
-      /* Закругление углов таблицы */
-      margin-bottom: 16px;
-      /* Отступ снизу */
+      margin-bottom: 24px;
     }
 
     thead {
       background-color: #eee;
-      /* Цвет фона шапки таблицы */
       font-weight: bold;
-      /* Установка жирного начертания шрифта для заголовков */
       text-align: center;
-      /* Выравнивание текста по центру */
       color: #444;
-      /* Цвет текста */
-    }
-
-    tr {
-      background-color: #fff;
-      /* Цвет фона строк таблицы */
     }
 
     th,
     td {
       padding: 12px;
-      /* Внутренний отступ внутри ячеек */
       text-align: center;
-      /* Выравнивание текста по центру */
       font-size: 14px;
-      /* Размер шрифта */
       border: 1px solid #ccc;
-      /* Границы ячеек */
     }
 
     tbody td {
       font-weight: 400;
-      /* Установка обычного начертания шрифта для данных в ячейках таблицы */
     }
 
     form {
       margin-top: 24px;
-      /* Отступ сверху для формы */
     }
 
-    .add-button {
-      background-color: #007bff;
-      /* Цвет фона кнопки добавления */
-      color: white;
-      /* Цвет текста кнопки добавления */
-      padding: 10px 16px;
-      /* Внутренний отступ кнопки */
-      border: none;
-      /* Удаление границы кнопки */
+    label {
+      margin-right: 8px;
+    }
+
+    input[type="date"] {
+      padding: 8px;
       border-radius: 4px;
-      /* Закругление углов кнопки */
+      border: 1px solid #ccc;
+    }
+
+    button[type="submit"] {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-      /* Установка курсора при наведении */
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+
+    .add-button,
+    .Hidden-button,
+    .Show-hidden-button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 8px;
     }
 
     .Hidden-button {
       background-color: #4CAF50;
-      /* Цвет фона кнопок скрытия/показа */
-      color: white;
-      /* Цвет текста кнопок скрытия/показа */
-      padding: 10px 16px;
-      /* Внутренний отступ кнопок */
-      border: none;
-      /* Удаление границы кнопок */
-      border-radius: 4px;
-      /* Закругление углов кнопок */
-      cursor: pointer;
-      /* Установка курсора при наведении */
     }
 
     .Show-hidden-button {
       background-color: #e7674d;
-      /* Цвет фона кнопок скрытия/показа */
-      color: white;
-      /* Цвет текста кнопок скрытия/показа */
-      padding: 10px 16px;
-      /* Внутренний отступ кнопок */
-      border: none;
-      /* Удаление границы кнопок */
-      border-radius: 4px;
-      /* Закругление углов кнопок */
-      cursor: pointer;
-      /* Установка курсора при наведении */
-    }
-
-    .hidden-row {
-      display: none;
-      /* Скрытие строк с классом 'hidden-row' */
-    }
-
-    .newly-shown-row {
-      display: table-row;
-      /* Отображение строк с классом 'newly-shown-row' как строки таблицы */
     }
 
     .button-edit {
       background-color: #e62914;
-      /* Красный цвет фона кнопки изменить */
       color: #fff;
-      /* Белый цвет текста кнопки изменить */
       padding: 5px 10px;
-      /* Внутренний отступ вокруг текста */
       border: 2px solid #c0392b;
-      /* Цвет границы кнопки изменить */
       border-radius: 5px;
-      /* Закругление углов кнопки изменить */
       text-align: center;
-      /* Выравнивание текста по центру */
       text-decoration: none;
-      /* Удаление подчеркивания из текста */
       display: inline-block;
-      /* Элемент блочного уровня с инлайн-боксом */
       font-size: 14px;
-      /* Размер шрифта */
       transition: background-color 0.3s ease;
-      /* Плавный переход цвета фона при наведении */
       cursor: pointer;
-      /* Изменение формы указателя на руку при наведении */
     }
 
     .button-edit:hover {
       background-color: #c0392b;
-      /* Темнокрасный цвет фона кнопки изменить при наведении */
-      color: #fff;
-      /* Белый цвет текста кнопки изменить при наведении */
     }
 
-    #searchInput {
-      width: 100%;
-      /* Занимает всю доступную ширину контейнера */
-      padding: 10px;
-      /* Внутренний отступ вокруг текста в поле ввода */
-      box-sizing: border-box;
-      /* Включение внутреннего и внешнего отступа в общую ширину/высоту элемента */
-      border: 1px solid #ccc;
-      /* Цвет границы поля ввода */
-      border-radius: 4px;
-      /* Закругление углов поля ввода */
-      margin-bottom: 16px;
-      /* Нижний отступ для разделения элементов */
-      font-size: 14px;
-      /* Размер шрифта */
+    .form-container {
+      display: flex;
+      justify-content: right;
+      /* Центрируем по горизонтали */
+      align-items: center;
+      /* Центрируем по вертикали */
+      height: 0vh;
+      /* Устанавливаем высоту контейнера на всю высоту видимой области страницы */
     }
 
-    #searchInput:focus {
-      outline: none;
-      /* Убирает контур при фокусе на поле ввода */
-      border-color: #007bff;
-      /* Изменяет цвет границы при фокусе на поле ввода */
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-      /* Добавляет тень при фокусе на поле ввода */
+    .form {
+      background-color: #fff;
+      /* Задаем цвет фона формы */
+      border-radius: 8px;
+      /* Задаем скругление углов формы */
+      padding: 5px 10px;
+      /* Добавляем отступы вокруг элементов формы */
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      /* Добавляем тень */
+    }
+
+    .form-container button[type="submit"] {
+      margin: 0 auto;
+      /* Центрирование по горизонтали */
+      display: block;
+      /* Делаем кнопку блочным элементом, чтобы можно было применить margin auto */
     }
   </style>
 </head>
 
 <body>
 
-
   <h2>Warehouse Movements</h2>
 
-  <form>
-    <table>
-      <thead>
-        <tr>
-          <th>Commentary</th>
-          <th>Quantity</th>
-          <th>Components</th>
-          <th>IdWarehousePlus</th>
-          <th>IdWarehouseMinus</th>
-          <th>Date</th>
-          <th>Hidden</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for warehouse_movement in warehouse_movements %}
-        <tr>
-          <td>{{ warehouse_movement.Comment }}</td>
-          <td>{{ warehouse_movement.quantity }}</td>
-          <td>{{ warehouse_movement.IdComponents }}</td>
-          <td>{{ warehouse_movement.IdWarehousePlus }}</td>
-          <td>{{ warehouse_movement.IdWarehouseMinus }}</td>
-          <td>{{ warehouse_movement.date }}</td>
-          <td>
-            <input type="checkbox" {% if warehouse.hidden %}checked{% endif %} data-warehouse-id="{{ warehouse.id }}"
-              class="hidden-checkbox">
-          </td>
-          <td>
-            <button type="button"  class="button-edit">Edit</button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <table>
+    <thead>
+      <tr>
+        <th>Commentary</th>
+        <th>Quantity</th>
+        <th>Components</th>
+        <th>IdWarehousePlus</th>
+        <th>IdWarehouseMinus</th>
+        <th>Date</th>
+        <th>Hidden</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for warehouse_movement in warehouse_movements %}
+      <tr>
+        <td>{{ warehouse_movement.Comment }}</td>
+        <td>{{ warehouse_movement.quantity }}</td>
+        <td>{{ warehouse_movement.IdComponents }}</td>
+        <td>{{ warehouse_movement.IdWarehousePlus }}</td>
+        <td>{{ warehouse_movement.IdWarehouseMinus }}</td>
+        <td>{{ warehouse_movement.date }}</td>
+        <td>
+          <input type="checkbox" {% if warehouse.hidden %}checked{% endif %} data-warehouse-id="{{ warehouse.id }}"
+            class="hidden-checkbox">
+        </td>
+        <td>
+          <button type="button" class="button-edit">Edit</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-    <a href="{% url 'add_warehouse_movement' %}"><button type="button" class="add-button">Add</button></a>
-    <button type="button" class="Hidden-button">Save changes</button>
-    <button type="button" class="Show-hidden-button">Show hidden</button>
-  </form>
+  <a href="{% url 'add_warehouse_movement' %}"><button type="button" class="add-button">Add</button></a>
+  <button type="button" class="Hidden-button">Save changes</button>
+  <button type="button" class="Show-hidden-button">Show hidden</button>
+
+  <div class="form-container">
+    <form class="form" method="GET" action="{% url 'export_warehouse_movements' %}">
+      <label for="start_date">Start Date:</label>
+      <input type="date" id="start_date" name="start_date">
+
+      <label for="end_date">End Date:</label>
+      <input type="date" id="end_date" name="end_date">
+      <p>
+
+        <button type="submit">Export to Word</button>
+    </form>
+  </div>
+
+
+
   {% endblock %}
 </body>
 

@@ -1,3 +1,4 @@
+import io
 import traceback
 from unittest import result
 from django.shortcuts import get_object_or_404, render, redirect
@@ -284,9 +285,9 @@ def employees(request):
 def add_employees(request):
     if request.method == 'POST':
         name = request.POST['name']
-        last_name = request.POST['last_name']
+        last_name = request.POST['last_name']  # Исправлено на 'last_name'
 
-        new_employee = Employee(name=name, lastName=last_name)
+        new_employee = Employee(name=name, lastName=last_name)  # Исправлено на 'lastName'
         new_employee.save()
         return redirect('employees')
     
@@ -568,6 +569,39 @@ def add_warehouse_movement(request):
     }
 
     return render(request, 'add_warehouse_movements.html', context)
+
+def export_warehouse_movements(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    warehouse_movements = WarehouseMovement.objects.all()
+
+    if start_date and end_date:
+        warehouse_movements = warehouse_movements.filter(date__range=[start_date, end_date])
+
+    # Создание документа Word
+    document = Document()
+    document.add_heading('Warehouse Movements', 0)
+    
+    # Добавление данных в документ
+    for warehouse_movement in warehouse_movements:
+        document.add_paragraph(f"Comment: {warehouse_movement.Comment}")
+        document.add_paragraph(f"Quantity: {warehouse_movement.quantity}")
+        document.add_paragraph(f"Components: {warehouse_movement.IdComponents}")
+        document.add_paragraph(f"IdWarehousePlus: {warehouse_movement.IdWarehousePlus}")
+        document.add_paragraph(f"IdWarehouseMinus: {warehouse_movement.IdWarehouseMinus}")
+        document.add_paragraph(f"Date: {warehouse_movement.date}")
+        document.add_paragraph("-------------------")
+
+    # Создание буфера для хранения данных документа
+    buffer = io.BytesIO()
+    document.save(buffer)
+    buffer.seek(0)
+
+    # Отправка файла пользователю
+    response = HttpResponse(buffer.read(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = 'attachment; filename=WarehouseMovements.docx'
+    return response
     
 #-------------------------------------------------------------------------------------
 

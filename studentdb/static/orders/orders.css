@@ -115,11 +115,17 @@ form {
 .hidden-row {
     display: none;
     /* Скрытие строк с классом 'hidden-row' */
+    width: 100%; /* Установка ширины на 100% */
+    height: auto; /* Установка высоты как автоматическую */
 }
 
 .newly-shown-row {
     display: table-row;
     /* Отображение строк с классом 'newly-shown-row' как строки таблицы */
+}
+
+tr.hidden-row {
+    display: table-row; /* Отображать скрытые строки как обычные */
 }
 
 .button-edit {

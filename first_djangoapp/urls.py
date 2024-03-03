@@ -44,15 +44,17 @@ urlpatterns = [
     path('add_offices/', views.add_offices, name='add_offices'),
     path('edit_office/<int:office_id>/', views.edit_office, name='edit_office'),
     path('update_hidden_status_offices/', views.update_hidden_status_offices, name='update_hidden_status_offices'),
+    path('export_to_word_office/', views.export_to_word_office, name='export_to_word_office'),
     
     path('employees/', views.employees, name='employees'),
     path('employees/add/', views.add_employees, name='add_employees'),
     path('edit_employees/<int:employee_id>/', views.edit_employees, name='edit_employees'),
-    path('update_hidden_status_employees/', views.update_hidden_status_employees, name='update_hidden_status_employees'),
+    path('/offices/export_to_word_office/', views.update_hidden_status_employees, name='update_hidden_status_employees'),
 
     path('orders/', views.orders, name='orders'),
     path('add_orders/add', views.add_orders, name='add_orders'),
     path('edit_orders/<int:order_id>/', views.edit_orders, name='edit_orders'),
+    path('update_hidden_status_orders/', views.update_hidden_status_orders, name='update_hidden_status_orders'),
     
     path('components/', views.components, name='components'),
     path('components/add/', views.add_components, name='add_components'),

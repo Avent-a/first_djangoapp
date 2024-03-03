@@ -20,3 +20,78 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function () {
+    // Обработка события клика по кнопке "Save changes"
+    $('.Hidden-button').click(function () {
+        // Перезагрузить страницу
+        location.reload();
+    });
+});
+
+$(document).ready(function () {
+    // Установка CSRF-токена для AJAX-запросов
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    // Обработка события изменения чекбокса
+    $('.hidden-checkbox').change(function () {
+        // Получить id заказа
+        var orderId = $(this).data('order-id');
+        // Получить состояние чекбокса (выбран или нет)
+        var isChecked = $(this).prop('checked');
+        // Отправить AJAX-запрос для обновления состояния скрытости
+        updateHiddenStatus(orderId, isChecked);
+    });
+
+    // Функция для отправки AJAX-запроса для обновления состояния скрытости
+    function updateHiddenStatus(orderId, isChecked) {
+        $.ajax({
+            method: 'POST',
+            url: '/update_hidden_status_orders/',
+            data: {
+                order_id: orderId,
+                is_checked: isChecked,
+                csrfmiddlewaretoken: getCookie('csrftoken')
+            },
+            success: function (data) {
+
+                if (data.success) {
+                    // В случае успеха можно выполнить дополнительные действия, если нужно
+                    console.log('Состояние скрытости успешно обновлено.');
+
+                } else {
+                    console.error('Ошибка при обновлении состояния скрытости:', data.error);
+                }
+            },
+            error: function (error) {
+                console.error('Ошибка при обновлении состояния скрытости:', error);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        // Скрыть все скрытые строки при загрузке страницы
+        $('.order-row.hidden-row').hide();
+
+        $('.Show-hidden-button').click(function () {
+            // Переключить видимость только скрытых строк
+            $('.order-row.hidden-row').toggle();
+            // Обновить текст кнопки в зависимости от видимости скрытых строк
+            var buttonText = $('.order-row.hidden-row').is(':visible') ? 'Hide hidden' : 'Show hidden';
+            $(this).text(buttonText);
+        });
+    });
+});

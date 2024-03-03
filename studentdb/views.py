@@ -1,4 +1,5 @@
 import io
+import json
 import traceback
 from unittest import result
 from django.shortcuts import get_object_or_404, render, redirect
@@ -19,6 +20,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from docx import Document
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -228,23 +230,19 @@ def add_offices(request):
     if request.method == 'POST':
         address = request.POST['address']
         area = request.POST['area']
-        phone = request.POST['phone']  
+        phone = request.POST['phone']
 
-        new_office = Office(address=address, area=area, phone=phone)
-        new_office.save()
+        new_office = Office.objects.create(address=address, area=area, phone=phone)
         return redirect('offices')
     return render(request, 'add_offices.html')
-
-
 
 def edit_office(request, office_id):
     office = get_object_or_404(Office, pk=office_id)
 
     if request.method == 'POST':
-        # Обработка отправки формы для обновления деталей офиса
         address = request.POST['address']
         area = request.POST['area']
-        phone = request.POST['phone'] 
+        phone = request.POST['phone']
 
         office.address = address
         office.area = area
@@ -254,13 +252,12 @@ def edit_office(request, office_id):
         return redirect('offices')
 
     return render(request, 'edit/edit_office.html', {'office': office})
-    
+
 def update_hidden_status_offices(request):
     if request.method == 'POST':
         office_id = request.POST.get('office_id')
         is_hidden_str = request.POST.get('is_hidden')
 
-        # Convert the string "true" to a boolean value
         is_hidden = is_hidden_str.lower() == 'true'
 
         try:
@@ -274,6 +271,32 @@ def update_hidden_status_offices(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def export_to_word_office(request):
+    offices = Office.objects.all()
+
+    document = Document()
+    document.add_heading('Offices Export', level=1)
+
+    table = document.add_table(rows=1, cols=3)
+    table.style = 'Table Grid'
+    
+    header_cells = table.rows[0].cells
+    header_cells[0].text = 'Address'
+    header_cells[1].text = 'Area'
+    header_cells[2].text = 'Phone'
+
+    for office in offices:
+        row_cells = table.add_row().cells
+        row_cells[0].text = office.address
+        row_cells[1].text = str(office.area)  # Ensure area is converted to string
+        row_cells[2].text = office.phone
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = 'attachment; filename=office_export.docx'
+    document.save(response)
+
+    return response
 #-------------------------------------------------------------------------------------
 
 def employees(request):
@@ -420,7 +443,25 @@ def edit_orders(request, order_id):
     except Exception as e:
         # Отображение информации об ошибке
         return HttpResponseServerError(f"Internal Server Error: {str(e)}")
+
+def update_hidden_status_orders(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        is_checked = request.POST.get('is_checked')
+
+        try:
+            # Получение объекта заказа по его идентификатору
+            order = Order.objects.get(pk=order_id)
+            # Преобразование строки "true" в логическое значение
+            order.hidden = is_checked.lower() == 'true'
+            order.save()
+            return JsonResponse({'success': True, 'hidden': order.hidden})
+        except ObjectDoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Order not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
     
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 #-------------------------------------------------------------------------------------
 

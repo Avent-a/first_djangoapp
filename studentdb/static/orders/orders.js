@@ -95,3 +95,32 @@ $(document).ready(function () {
         });
     });
 });
+
+
+$(document).ready(function () {
+    // Function to update table based on selected status
+    function updateTable(status) {
+        var rows = $('.order-row');
+        rows.hide();
+        if (status === '') {
+            rows.not('.hidden-row').show();
+        } else {
+            rows.filter('[data-status="' + status + '"]').not('.hidden-row').show();
+        }
+    }
+
+    // Handler for status filter change
+    $('#statusFilter').change(function () {
+        updateTable($(this).val());
+    });
+
+    // Handler for export button click
+    $('.export-button').click(function () {
+        var selectedStatus = $('#statusFilter').val();
+        // Sending GET request to server with selected status
+        window.location.href = '/export_to_word_orders/?status=' + selectedStatus;
+    });
+
+    // Initializing table based on selected status
+    updateTable($('#statusFilter').val());
+});

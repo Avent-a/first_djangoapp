@@ -21,6 +21,8 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from docx import Document
 from django.core.exceptions import ObjectDoesNotExist
+from docx.shared import Inches
+
 
 
 
@@ -134,6 +136,8 @@ def edit_warehouse(request, warehouse_id):
 def export_to_word(request):
     warehouses = Warehouse.objects.all()
 
+    warehouses = warehouses.filter(hidden=False)
+
     document = Document()
     document.add_heading('Warehouse Export', level=1)
 
@@ -218,6 +222,31 @@ def edit_products(request, product_id):
     except Exception as e:
         return HttpResponseServerError(f"Internal Server Error: {str(e)}")
 
+def export_to_word_products(request):
+    products = Product.objects.all()
+
+    products = products.filter(hidden=False)
+
+    document = Document()
+    document.add_heading('Products Export', level=1)
+
+    table = document.add_table(rows=1, cols=2)
+    table.style = 'Table Grid'
+    
+    header_cells = table.rows[0].cells
+    header_cells[0].text = 'Name'
+    header_cells[1].text = 'Category'
+
+    for product in products:
+        row_cells = table.add_row().cells
+        row_cells[0].text = product.name
+        row_cells[1].text = product.category.name  # Assuming category has a 'name' field
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = 'attachment; filename=products_export.docx'
+    document.save(response)
+
+    return response
 #-------------------------------------------------------------------------------------
 
 def offices(request):
@@ -275,6 +304,8 @@ def update_hidden_status_offices(request):
 def export_to_word_office(request):
     offices = Office.objects.all()
 
+    offices = offices.filter(hidden=False)
+
     document = Document()
     document.add_heading('Offices Export', level=1)
 
@@ -308,9 +339,9 @@ def employees(request):
 def add_employees(request):
     if request.method == 'POST':
         name = request.POST['name']
-        last_name = request.POST['last_name']  # Исправлено на 'last_name'
+        last_name = request.POST['last_name']
 
-        new_employee = Employee(name=name, lastName=last_name)  # Исправлено на 'lastName'
+        new_employee = Employee(name=name, lastName=last_name)
         new_employee.save()
         return redirect('employees')
     
@@ -352,25 +383,51 @@ def edit_employees(request, employee_id):
 
         return render(request, 'edit/edit_employees.html', {'employee': employee})
     except Exception as e:
-        # Отображение информации об ошибке
+        # Displaying error information
         return HttpResponseServerError(f"Internal Server Error: {str(e)}")
     
 def login(request):
     if request.method == 'POST':
         name = request.POST.get('name')
-        lastName = request.POST.get('lastName')
+        last_name = request.POST.get('last_name')
 
         try:
-            employee = Employee.objects.get(name=name, lastName=lastName)
+            employee = Employee.objects.get(name=name, lastName=last_name)
             request.session['employee_id'] = employee.id
-            request.session['is_admin'] = employee.is_admin  # Добавляем атрибут is_admin в сессию
+            request.session['is_admin'] = employee.is_admin
             return redirect('index')
         except Employee.DoesNotExist:
-            pass  # Сотрудник не найден
+            pass  # Employee not found
 
-        messages.error(request, 'Неправильное имя или фамилия сотрудника.')
+        messages.error(request, 'Incorrect name or last name of the employee.')
 
     return render(request, 'login.html')
+
+def export_to_word_employees(request):
+    employees = Employee.objects.all()
+
+    employees = employees.filter(hidden=False)
+
+    document = Document()
+    document.add_heading('Employees Export', level=1)
+
+    table = document.add_table(rows=1, cols=2)
+    table.style = 'Table Grid'
+    
+    header_cells = table.rows[0].cells
+    header_cells[0].text = 'Name'
+    header_cells[1].text = 'Last Name'
+
+    for employee in employees:
+        row_cells = table.add_row().cells
+        row_cells[0].text = employee.name
+        row_cells[1].text = employee.lastName
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = 'attachment; filename=employees_export.docx'
+    document.save(response)
+
+    return response
 
 #-------------------------------------------------------------------------------------
 
@@ -462,6 +519,51 @@ def update_hidden_status_orders(request):
             return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def export_to_word_orders(request):
+    selected_status = request.GET.get('status')
+
+    # Filtering orders based on selected status
+    if selected_status:
+        orders = Order.objects.filter(status=selected_status)
+    else:
+        orders = Order.objects.all()
+    
+    # Excluding hidden orders
+    orders = orders.filter(hidden=False)
+
+    document = Document()
+    document.add_heading('Exported Orders', level=1)
+
+    table = document.add_table(rows=1, cols=6)
+    table.style = 'Table Grid'
+    
+    header_cells = table.rows[0].cells
+    header_cells[0].text = 'Date'
+    header_cells[1].text = 'Status'
+    header_cells[2].text = 'Employee'
+    header_cells[3].text = 'Product'
+    header_cells[4].text = 'Comment'
+    header_cells[5].text = 'Office'
+
+    for order in orders:
+        row_cells = table.add_row().cells
+        row_cells[0].text = str(order.date)
+        row_cells[1].text = order.status
+        row_cells[2].text = order.employee.name
+        row_cells[3].text = order.product.name
+        row_cells[4].text = order.comment
+        row_cells[5].text = order.IdOffice.address
+
+    for col in table.columns:
+        col.width = Inches(2)
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = 'attachment; filename=orders_export.docx'
+    document.save(response)
+
+    return response
+
 
 #-------------------------------------------------------------------------------------
 

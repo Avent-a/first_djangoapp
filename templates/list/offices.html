@@ -25,6 +25,7 @@
                     <th>Address</th>
                     <th>Area</th>
                     <th>Phone</th>
+                    <th>Hidden</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -34,6 +35,9 @@
                     <td>{{ office.address }}</td>
                     <td>{{ office.area }}</td>
                     <td>{{ office.phone }}</td>
+                    <td>
+                        <input type="checkbox" {% if office.hidden %}checked{% endif %} data-office-id="{{ office.id }}" class="hidden-checkbox">
+                    </td>
                     <td>
                         <a href="{% url 'edit_office' office.id %}"><button type="button" class="button-edit">Edit</button></a>
                     </td>
@@ -65,10 +69,6 @@
           /* Курсор указателя при наведении */
           margin-right: 10px;
           /* Правый отступ для разделения от других кнопок */
-          margin-left: auto;
-          /* Автоматическое выравнивание по правому краю */
-          display: block;
-          /* Элемент блочного уровня */
       }
       
       .export-button:hover {

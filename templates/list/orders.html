@@ -18,6 +18,14 @@
     <h2>Orders</h2>
     <!-- Search input field -->
     <input type="text" id="searchInput" placeholder="Search...">
+    <!-- Status filter dropdown -->
+    <select id="statusFilter">
+        <option value="">All</option>
+        <option value="PENDING">В ожидании</option>
+        <option value="PROCESSING">В обработке</option>
+        <option value="COMPLETED">Завершен</option>
+        <option value="CANCELLED">Отменен</option>
+    </select>
     <form method="post">
         <table>
             <thead>
@@ -34,7 +42,8 @@
             </thead>
             <tbody>
                 {% for order in orders %}
-                <tr class="order-row {% if order.hidden %}hidden-row{% endif %}" data-order-id="{{ order.id }}">
+                <tr class="order-row {% if order.hidden %}hidden-row{% endif %}" data-order-id="{{ order.id }}"
+                    data-status="{{ order.status }}">
                     <td>{{ order.date }}</td>
                     <td>{{ order.status }}</td>
                     <td>{{ order.employee }}</td>
@@ -57,6 +66,40 @@
         <a href="{% url 'add_orders' %}"><button type="button" class="add-button">Add</button></a>
         <button type="button" class="Hidden-button">Save changes</button>
         <button type="button" class="Show-hidden-button">Show hidden</button>
+        <a href="{% url 'export_to_word_orders' %}" target="_blank"><button type="button" class="export-button">Export
+                to Word</button></a>
+
         {% csrf_token %} <!-- Вставляем CSRF-токен в форму -->
     </form>
+    <style>
+        /* Стиль для кнопки "Export to Word" */
+        .export-button {
+            background-color: #3498db;
+            /* Цвет фона кнопки "Export to Word" */
+            color: white;
+            /* Цвет текста кнопки "Export to Word" */
+            padding: 10px 16px;
+            /* Внутренний отступ кнопки "Export to Word" */
+            border: none;
+            /* Граница отсутствует */
+            border-radius: 4px;
+            /* Закругление углов кнопки "Export to Word" */
+            cursor: pointer;
+            /* Курсор указателя при наведении */
+            margin-right: 10px;
+            /* Правый отступ для разделения от других кнопок */
+            margin-left: auto;
+            /* Автоматическое выравнивание по правому краю */
+        }
+
+        .export-button:hover {
+            background-color: #2980b9;
+            /* Цвет фона кнопки "Export to Word" при наведении */
+            /* Обновленный цвет для выделения кнопки на hover */
+        }
+    </style>
+
     {% endblock %}
+</body>
+
+</html>

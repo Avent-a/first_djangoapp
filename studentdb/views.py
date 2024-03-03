@@ -420,6 +420,7 @@ def edit_orders(request, order_id):
     except Exception as e:
         # Отображение информации об ошибке
         return HttpResponseServerError(f"Internal Server Error: {str(e)}")
+    
 
 #-------------------------------------------------------------------------------------
 

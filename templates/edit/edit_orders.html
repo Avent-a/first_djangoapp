@@ -39,7 +39,7 @@
     <label for="office">Office:</label>
     <select id="office" name="office">
         {% for office in offices %}
-        <option value="{{ office.id }}" {% if order.IdOffice_id == office.id %}selected{% endif %}>{{ office.name }}</option>
+        <option value="{{ office.id }}">{{ office.address }}</option>
         {% endfor %}
     </select>
 
